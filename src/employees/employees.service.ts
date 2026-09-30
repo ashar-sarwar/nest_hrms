@@ -3,8 +3,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { Role } from 'generated/prisma/enums';
 import { userPublicSelect } from 'src/users/user-select';
+import { EmployeeQueryDto } from './dto/employee-query.dto';
 
 @Injectable()
 export class EmployeesService {
@@ -50,17 +50,47 @@ export class EmployeesService {
       },
     });
   }
-  async findAll(role?: Role) {
-    const where = role
-      ? {
-          user: {
-            role,
-          },
-        }
-      : {};
+
+  async findAll(query: EmployeeQueryDto) {
+    const {
+      department,
+      search,
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      order = 'desc',
+    } = query;
 
     return this.databaseService.employee.findMany({
-      where,
+      where: {
+        department,
+
+        OR: search
+          ? [
+              {
+                name: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                designation: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+            ]
+          : undefined,
+      },
+
+      skip: (page - 1) * limit,
+
+      take: limit,
+
+      orderBy: {
+        [sortBy]: order,
+      },
+
       include: {
         user: {
           select: userPublicSelect,

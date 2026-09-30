@@ -20,6 +20,7 @@ import { AuthenticatedUser } from 'src/auth/types/authenticated-user.type';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { EmployeeQueryDto } from './dto/employee-query.dto';
 
 @Controller('employees')
 export class EmployeesController {
@@ -43,10 +44,13 @@ export class EmployeesController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll(@GetUser() user: AuthenticatedUser, @Query('role') role?: Role) {
+  findAll(
+    @GetUser() user: AuthenticatedUser,
+    @Query() query: EmployeeQueryDto,
+  ) {
     console.log(user);
 
-    return this.employeesService.findAll(role);
+    return this.employeesService.findAll(query);
   }
 
   @SkipThrottle() // Skip throttling for this route

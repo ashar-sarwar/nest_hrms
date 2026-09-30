@@ -20,15 +20,28 @@ model User {
 }
 
 model Employee {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    Int?     @unique // Foreign Key
-  user      User?    @relation(fields: [userId], references: [id]) // Relationship
+  id          Int         @id @default(autoincrement())
+  name        String
+  phone       String?
+  address     String?
+  department  Department?
+  designation String?
+  salary      Int?
+  joiningDate DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  userId      Int?        @unique
+  user        User?       @relation(fields: [userId], references: [id])
 }
 
 enum Role {
   ADMIN
   INTERN
+}
+
+enum Department {
+  ENGINEERING
+  HR
+  FINANCE
+  SALES
 }
